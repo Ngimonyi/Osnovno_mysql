@@ -123,3 +123,50 @@ INSERT INTO posudbe (clan_id, kopija_id, datum_posudbe) VALUES (1, 3, '2023-06-0
 1. Navedite sve članove koji su posudili knjige, zajedno s naslovima knjiga koje su posudili.
 2. Pronađite članove koji imaju zakašnjele knjige.
 3. Pronađite sve žanrove i broj dostupnih knjiga u svakom žanru.
+
+#### Rjesenje:
+
+1. zadatak
+```sql
+SELECT
+    CONCAT(clanovi.ime, " ", clanovi.prezime) AS Ime,
+    knjige.naslov AS Knjiga
+FROM
+    posudbe
+    JOIN clanovi ON posudbe.clan_id = clanovi.id
+    JOIN kopija ON posudbe.kopija_id = kopija.id
+    JOIN knjige ON kopija.knjiga_id = knjige.id;
+```
+
+2. zadatak
+```sql
+SELECT 
+    CONCAT(clanovi.ime, " ", clanovi.prezime) AS Clan,
+    knjige.naslov,
+    posudbe.datum_posudbe,
+    posudbe.datum_povrata
+FROM
+    posudbe
+    JOIN clanovi ON posudbe.clan_id = clanovi.id
+    JOIN kopija ON posudbe.kopija_id = kopija.id
+    JOIN knjige ON kopija.knjiga_id = knjige.id
+WHERE 
+    posudbe.datum_povrata IS NULL AND CURDATE() -  posudbe.datum_posudbe > 14
+    OR
+    posudbe.datum_povrata - posudbe.datum_posudbe > 14;
+```
+
+3. zadatak
+```sql
+SELECT 
+    zanrovi.naziv AS zanr,
+    COUNT(kopija.id) AS broj_dostupnih_knjiga
+FROM
+    zanrovi
+    JOIN knjige ON zanrovi.id = knjige.zanr_id
+    JOIN kopija ON knjige.id = kopija.knjiga_id
+WHERE 
+    kopija.dostupna = 1
+GROUP BY 
+    zanrovi.id;
+```
